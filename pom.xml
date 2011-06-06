@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.levigo.jadice.documentplatform.showcase</groupId>
+	<artifactId>jadice-5-tech-showcase</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<properties>
+		<jadice.version>5.0.0.0-RC-2</jadice.version>
+	</properties>
+
+	<dependencies>
+		<!-- CORE -->
+		<dependency>
+			<groupId>com.levigo.jadice.documentplatform</groupId>
+			<artifactId>jadice-viewer</artifactId>
+			<version>${jadice.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.levigo.jadice.documentplatform</groupId>
+			<artifactId>jadice-appbase</artifactId>
+			<version>${jadice.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.levigo.jadice.documentplatform</groupId>
+			<artifactId>jadice-demo-client</artifactId>
+			<version>${jadice.version}</version>
+		</dependency>
+
+		<!-- FORMATS -->
+		<dependency>
+			<groupId>com.levigo.jadice.documentplatform</groupId>
+			<artifactId>jadice-format-modca</artifactId>
+			<version>${jadice.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.levigo.jadice.documentplatform</groupId>
+			<artifactId>jadice-format-pdf</artifactId>
+			<version>${jadice.version}</version>
+		</dependency>
+
+		<!-- ADDONS -->
+		<dependency>
+			<groupId>com.levigo.jadice.documentplatform</groupId>
+			<artifactId>jadice-addon-crosshair</artifactId>
+			<version>${jadice.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.levigo.jadice.documentplatform</groupId>
+			<artifactId>jadice-addon-crosshair</artifactId>
+			<version>${jadice.version}</version>
+		</dependency>
+
+		<!-- UTILITIES -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>r09</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
