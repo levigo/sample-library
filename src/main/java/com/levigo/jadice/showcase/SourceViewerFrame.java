@@ -10,14 +10,60 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 
 public class SourceViewerFrame extends JFrame {
+  private static final class ByteArraySourceInputSupplier implements NamedInputSupplier<String> {
+    private final byte[] data;
+    private final String name;
 
-  public SourceViewerFrame(Class<?>... classes) {
+    private ByteArraySourceInputSupplier(byte[] data, String name) {
+      this.data = data;
+      this.name = name;
+    }
+
+    @Override
+    public String getInput() throws IOException {
+      return CharStreams.toString(CharStreams.newReaderSupplier(ByteStreams.newInputStreamSupplier(data),
+          Charset.defaultCharset()));
+    }
+
+    @Override
+    public String getName() {
+      return name;
+    }
+  }
+
+  public static interface NamedInputSupplier<T> extends InputSupplier<T> {
+    String getName();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static SourceViewerFrame forBinary(final String name, final byte[] data) {
+    return new SourceViewerFrame(new ByteArraySourceInputSupplier(data, name));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static SourceViewerFrame forString(final String name, final String data) {
+    return new SourceViewerFrame(new StringInputSupplier(name, data));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static SourceViewerFrame forClasses(Class<?>... classes) {
+    final NamedInputSupplier<String>[] inputs = new NamedInputSupplier[classes.length];
+    for (int i = 0; i < inputs.length; i++) {
+      inputs[i] = resolveClassSource(classes[i]);
+    }
+
+    return new SourceViewerFrame(inputs);
+  }
+
+  public SourceViewerFrame(NamedInputSupplier<String>... input) {
 
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    setSize(800, 600);
 
     getContentPane().setLayout(new BorderLayout());
 
@@ -25,32 +71,70 @@ public class SourceViewerFrame extends JFrame {
     getContentPane().add(tabbedPane);
 
 
-    for (Class<?> c : classes) {
+    for (NamedInputSupplier<String> in : input) {
 
       final JEditorPane editorPane = new JEditorPane();
-      tabbedPane.addTab(c.getSimpleName(), new JScrollPane(editorPane));
-      
+      tabbedPane.addTab(in.getName(), new JScrollPane(editorPane));
+
       editorPane.setEditable(false);
-      editorPane.setContentType("text/java");
-      editorPane.setText(resolveClassSource(c));
+      if (in.getName().endsWith(".xml"))
+        editorPane.setContentType("text/xml");
+      else
+        editorPane.setContentType("text/java");
+
+      try {
+        editorPane.setText(in.getInput());
+      } catch (IOException e) {
+        e.printStackTrace();
+        editorPane.setText("FAILED TO LOAD SOURCE CODE");
+      }
 
     }
 
   }
 
-  private String resolveClassSource(final Class<?> c) {
-    try {
-      return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>() {
+  private static class StringInputSupplier implements NamedInputSupplier<String> {
+    private final String name;
+    private final String input;
 
-        @Override
-        public InputStream getInput() throws IOException {
-          final String filename = '/' + c.getName().replace('.', '/') + ".java";
-          return SourceViewerFrame.class.getResourceAsStream(filename);
-        }
-      }, Charset.defaultCharset()));
-    } catch (IOException e) {
-      e.printStackTrace();
-      return "FAILED TO LOAD SOURCE CODE FOR: " + c.getName();
+    public StringInputSupplier(String name, String input) {
+      super();
+      this.name = name;
+      this.input = input;
     }
+
+    @Override
+    public String getInput() throws IOException {
+      return input;
+    }
+
+    @Override
+    public String getName() {
+      return name;
+    }
+
+
+  }
+
+  private static NamedInputSupplier<String> resolveClassSource(final Class<?> c) {
+
+    return new NamedInputSupplier<String>() {
+      @Override
+      public String getName() {
+        return c.getSimpleName();
+      }
+
+      @Override
+      public String getInput() throws IOException {
+        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>() {
+
+          @Override
+          public InputStream getInput() throws IOException {
+            final String filename = '/' + c.getName().replace('.', '/') + ".java";
+            return SourceViewerFrame.class.getResourceAsStream(filename);
+          }
+        }, Charset.defaultCharset()));
+      }
+    };
   }
 }

@@ -1,5 +1,10 @@
 package com.levigo.jadice.showcase;
 
+import com.levigo.jadice.demo.BasicJadicePanel;
+import com.levigo.jadice.document.read.fluent.Read;
+import com.levigo.jadice.document.read.fluent.SyncReadConfigurer;
+import com.levigo.jadice.swing.pageview.PageView;
+
 public abstract class AbstractSample implements Sample {
 
   private final String name;
@@ -20,5 +25,4 @@ public abstract class AbstractSample implements Sample {
   public final Class<?>[] getClasses() {
     return classes;
   }
-
 }

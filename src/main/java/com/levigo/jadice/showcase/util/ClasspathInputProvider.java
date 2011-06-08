@@ -1,4 +1,4 @@
-package com.levigo.jadice.showcase.read;
+package com.levigo.jadice.showcase.util;
 
 import java.io.IOException;
 import java.io.InputStream;
