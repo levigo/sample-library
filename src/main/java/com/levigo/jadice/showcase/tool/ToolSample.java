@@ -11,6 +11,11 @@ public class ToolSample extends AbstractSample implements StartStopSample {
   }
 
   @Override
+  public boolean isStarted(BasicJadicePanel basicJadicePanel) {
+    return basicJadicePanel.getPageView().getToolManager().getCompatibleTools(MarkerTool.class).size() > 0;
+  }
+
+  @Override
   public void start(BasicJadicePanel basicJadicePanel) {
     basicJadicePanel.getPageView().getToolManager().register(MarkerTool.class, true);
   }
@@ -18,11 +23,6 @@ public class ToolSample extends AbstractSample implements StartStopSample {
   @Override
   public void stop(BasicJadicePanel basicJadicePanel) {
     basicJadicePanel.getPageView().getToolManager().deregister(MarkerTool.class);
-  }
-
-  @Override
-  public boolean isStarted(BasicJadicePanel basicJadicePanel) {
-    return basicJadicePanel.getPageView().getToolManager().getCompatibleTools(MarkerTool.class).size() > 0;
   }
 
 }

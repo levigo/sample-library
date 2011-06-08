@@ -1,14 +1,10 @@
 package com.levigo.jadice.showcase;
 
-import com.levigo.jadice.demo.BasicJadicePanel;
-import com.levigo.jadice.document.read.fluent.Read;
-import com.levigo.jadice.document.read.fluent.SyncReadConfigurer;
-import com.levigo.jadice.swing.pageview.PageView;
 
 public abstract class AbstractSample implements Sample {
 
-  private final String name;
   private final Class<?>[] classes;
+  private final String name;
 
   public AbstractSample(String name, Class<?>... classes) {
     super();
@@ -17,12 +13,12 @@ public abstract class AbstractSample implements Sample {
   }
 
   @Override
-  public final String name() {
-    return name;
+  public final Class<?>[] getClasses() {
+    return classes;
   }
 
   @Override
-  public final Class<?>[] getClasses() {
-    return classes;
+  public final String name() {
+    return name;
   }
 }

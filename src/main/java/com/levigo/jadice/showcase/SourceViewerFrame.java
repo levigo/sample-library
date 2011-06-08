@@ -15,6 +15,11 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 
 public class SourceViewerFrame extends JFrame {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final class ByteArraySourceInputSupplier implements NamedInputSupplier<String> {
     private final byte[] data;
     private final String name;
@@ -40,14 +45,32 @@ public class SourceViewerFrame extends JFrame {
     String getName();
   }
 
-  @SuppressWarnings("unchecked")
-  public static SourceViewerFrame forBinary(final String name, final byte[] data) {
-    return new SourceViewerFrame(new ByteArraySourceInputSupplier(data, name));
+  private static class StringInputSupplier implements NamedInputSupplier<String> {
+    private final String input;
+    private final String name;
+
+    public StringInputSupplier(String name, String input) {
+      super();
+      this.name = name;
+      this.input = input;
+    }
+
+    @Override
+    public String getInput() throws IOException {
+      return input;
+    }
+
+    @Override
+    public String getName() {
+      return name;
+    }
+
+
   }
 
   @SuppressWarnings("unchecked")
-  public static SourceViewerFrame forString(final String name, final String data) {
-    return new SourceViewerFrame(new StringInputSupplier(name, data));
+  public static SourceViewerFrame forBinary(final String name, final byte[] data) {
+    return new SourceViewerFrame(new ByteArraySourceInputSupplier(data, name));
   }
 
   @SuppressWarnings("unchecked")
@@ -58,6 +81,33 @@ public class SourceViewerFrame extends JFrame {
     }
 
     return new SourceViewerFrame(inputs);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static SourceViewerFrame forString(final String name, final String data) {
+    return new SourceViewerFrame(new StringInputSupplier(name, data));
+  }
+
+  private static NamedInputSupplier<String> resolveClassSource(final Class<?> c) {
+
+    return new NamedInputSupplier<String>() {
+      @Override
+      public String getInput() throws IOException {
+        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>() {
+
+          @Override
+          public InputStream getInput() throws IOException {
+            final String filename = '/' + c.getName().replace('.', '/') + ".java";
+            return SourceViewerFrame.class.getResourceAsStream(filename);
+          }
+        }, Charset.defaultCharset()));
+      }
+
+      @Override
+      public String getName() {
+        return c.getSimpleName();
+      }
+    };
   }
 
   public SourceViewerFrame(NamedInputSupplier<String>... input) {
@@ -91,50 +141,5 @@ public class SourceViewerFrame extends JFrame {
 
     }
 
-  }
-
-  private static class StringInputSupplier implements NamedInputSupplier<String> {
-    private final String name;
-    private final String input;
-
-    public StringInputSupplier(String name, String input) {
-      super();
-      this.name = name;
-      this.input = input;
-    }
-
-    @Override
-    public String getInput() throws IOException {
-      return input;
-    }
-
-    @Override
-    public String getName() {
-      return name;
-    }
-
-
-  }
-
-  private static NamedInputSupplier<String> resolveClassSource(final Class<?> c) {
-
-    return new NamedInputSupplier<String>() {
-      @Override
-      public String getName() {
-        return c.getSimpleName();
-      }
-
-      @Override
-      public String getInput() throws IOException {
-        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>() {
-
-          @Override
-          public InputStream getInput() throws IOException {
-            final String filename = '/' + c.getName().replace('.', '/') + ".java";
-            return SourceViewerFrame.class.getResourceAsStream(filename);
-          }
-        }, Charset.defaultCharset()));
-      }
-    };
   }
 }

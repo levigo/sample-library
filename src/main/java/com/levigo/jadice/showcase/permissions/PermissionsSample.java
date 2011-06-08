@@ -10,11 +10,16 @@ import com.levigo.jadice.showcase.StartStopSample;
 
 public class PermissionsSample extends AbstractSample implements StartStopSample {
 
+  private boolean started;
+
   public PermissionsSample() {
     super("Permissions, lock reordering", PermissionsSample.class);
   }
 
-  private boolean started;
+  @Override
+  public boolean isStarted(BasicJadicePanel basicJadicePanel) {
+    return started;
+  }
 
   @Override
   public void start(BasicJadicePanel basicJadicePanel) {
@@ -35,11 +40,6 @@ public class PermissionsSample extends AbstractSample implements StartStopSample
       doc.getPermissions().getPermissions().clear();
       started = false;
     }
-  }
-
-  @Override
-  public boolean isStarted(BasicJadicePanel basicJadicePanel) {
-    return started;
   }
 
 }

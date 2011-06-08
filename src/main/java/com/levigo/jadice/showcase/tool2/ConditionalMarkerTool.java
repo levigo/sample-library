@@ -17,9 +17,9 @@ import com.levigo.jadice.swing.tool.Tool;
 
 public class ConditionalMarkerTool extends Tool {
 
-  private static final String KEY = "valid";
-
   private static final BufferedImage INVALID = readImage("/com/levigo/jadice/showcase/tool/error.png");
+
+  private static final String KEY = "valid";
 
   private static final BufferedImage VALID = readImage("/com/levigo/jadice/showcase/tool/check.png");
 

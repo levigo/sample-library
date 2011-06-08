@@ -35,7 +35,6 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.dnd.DropTarget;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -87,37 +86,72 @@ import com.levigo.util.swing.action.DefaultMenuComponentFactory;
  * @author <a href="mailto:c.koehler@levigo.de">Carolin Koehler </a>
  */
 public class ShowcaseJadicePanel {
+  private static final String JADICE_NAME = "levigo \u00ae  -  " + "jadice \u00ae viewer "
+      + ProductInformation.getMajorVersion() + "." + ProductInformation.getMinorVersion();
   /**
    * serialVersionUID
    */
   private static final long serialVersionUID = 1L;
-  private static final String JADICE_NAME = "levigo \u00ae  -  " + "jadice \u00ae viewer "
-      + ProductInformation.getMajorVersion() + "." + ProductInformation.getMinorVersion();
 
-  /**
-   * Starts the application.
-   * 
-   * @param args an array of command-line arguments
-   */
-  public static void main(final java.lang.String[] args) {
+  private static void addMenuContributions(final PopupMenuTool popupMenuTool) {
 
-    // respect local system L&F
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (final Exception e) {
-      // don't care
-    }
+    // the action factory with all swing viewer actions.
+    final DefaultActionFactory viewerSwingActionFactory = //
+    DefaultActionFactory.getInstance("/com/levigo/jadice/swing/resources/actions.properties");
 
-    // Use default Jadice.properties from class path
-    JadicePropertiesConfiguration.configure();
+    final List<MenuContributor> fixedContributors = popupMenuTool.getFixedContributors();
 
-    // init gui just on edt!
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        initialiseGUI(args);
-      }
-    });
+    // Group annotation (only visible during annotation editing)
+    ActionFactoryMenuContributor mc = new AnnotationMenuContributor(viewerSwingActionFactory, "AnnoCTXAnnoDelete");
+    mc.setGroup("annotation");
+    fixedContributors.add(mc);
+
+    // Group prodInfo
+    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "ProductInfoSplash");
+    mc.setGroup("prodInfo");
+    fixedContributors.add(mc);
+
+    // Group pageexploring
+    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "FirstPage", "PreviousPage", "NextPage", "LastPage");
+    mc.setGroup("pageexploring");
+    fixedContributors.add(mc);
+
+    // Group zoom
+    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "ZoomIn", "ZoomOut");
+    mc.setGroup("zoom");
+    fixedContributors.add(mc);
+
+    // Group rotate
+    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "PageSpin270", "PageSpin90");
+    mc.setGroup("rotate");
+    fixedContributors.add(mc);
+  }
+
+  private static void configureAreaSelectionTool(final AreaSelectionTool areaSelectionTool, Context context) {
+    final DefaultActionFactory viewerSwingActionFactory = //
+    DefaultActionFactory.getInstance("/com/levigo/jadice/swing/resources/actions.properties");
+
+    areaSelectionTool.getMenuContributors().add(new ActionFactoryMenuContributor(viewerSwingActionFactory, //
+        "ZoomToSelection", //
+        "CopyRasterizedSelection", //
+        "CopySelectedText"));
+
+    final List<ExportHandler<Selection>> exportHandlers = areaSelectionTool.getExportHandlers().getHandlers();
+
+    exportHandlers.add(new RasterizedSelectionExportHandler());
+    exportHandlers.add(new SelectedTextExportHandler());
+  }
+
+  private static void configureTextSelectionTool(final TextSelectionTool textSelectionTool, Context context) {
+    final DefaultActionFactory viewerSwingActionFactory = //
+    DefaultActionFactory.getInstance("/com/levigo/jadice/swing/resources/actions.properties");
+
+    textSelectionTool.getMenuContributors().add(new ActionFactoryMenuContributor(viewerSwingActionFactory, //
+        "CopySelectedText"));
+
+    final List<ExportHandler<Selection>> exportHandlers = textSelectionTool.getExportHandlers().getHandlers();
+
+    exportHandlers.add(new SelectedTextExportHandler());
   }
 
   /**
@@ -204,73 +238,38 @@ public class ShowcaseJadicePanel {
 
     new JadiceProductInformationSplash(mainFrame, true);
 
-    
+
     // create and open the showcase controller frame
-    
+
     ControllerFrame cf = new ControllerFrame(mainViewerPanel);
     cf.pack();
     cf.setVisible(true);
   }
 
-  private static void configureAreaSelectionTool(final AreaSelectionTool areaSelectionTool, Context context) {
-    final DefaultActionFactory viewerSwingActionFactory = //
-    DefaultActionFactory.getInstance("/com/levigo/jadice/swing/resources/actions.properties");
+  /**
+   * Starts the application.
+   * 
+   * @param args an array of command-line arguments
+   */
+  public static void main(final java.lang.String[] args) {
 
-    areaSelectionTool.getMenuContributors().add(new ActionFactoryMenuContributor(viewerSwingActionFactory, //
-        "ZoomToSelection", //
-        "CopyRasterizedSelection", //
-        "CopySelectedText"));
+    // respect local system L&F
+    try {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    } catch (final Exception e) {
+      // don't care
+    }
 
-    final List<ExportHandler<Selection>> exportHandlers = areaSelectionTool.getExportHandlers().getHandlers();
+    // Use default Jadice.properties from class path
+    JadicePropertiesConfiguration.configure();
 
-    exportHandlers.add(new RasterizedSelectionExportHandler());
-    exportHandlers.add(new SelectedTextExportHandler());
-  }
-
-  private static void configureTextSelectionTool(final TextSelectionTool textSelectionTool, Context context) {
-    final DefaultActionFactory viewerSwingActionFactory = //
-    DefaultActionFactory.getInstance("/com/levigo/jadice/swing/resources/actions.properties");
-
-    textSelectionTool.getMenuContributors().add(new ActionFactoryMenuContributor(viewerSwingActionFactory, //
-        "CopySelectedText"));
-
-    final List<ExportHandler<Selection>> exportHandlers = textSelectionTool.getExportHandlers().getHandlers();
-
-    exportHandlers.add(new SelectedTextExportHandler());
-  }
-
-  private static void addMenuContributions(final PopupMenuTool popupMenuTool) {
-
-    // the action factory with all swing viewer actions.
-    final DefaultActionFactory viewerSwingActionFactory = //
-    DefaultActionFactory.getInstance("/com/levigo/jadice/swing/resources/actions.properties");
-
-    final List<MenuContributor> fixedContributors = popupMenuTool.getFixedContributors();
-
-    // Group annotation (only visible during annotation editing)
-    ActionFactoryMenuContributor mc = new AnnotationMenuContributor(viewerSwingActionFactory, "AnnoCTXAnnoDelete");
-    mc.setGroup("annotation");
-    fixedContributors.add(mc);
-
-    // Group prodInfo
-    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "ProductInfoSplash");
-    mc.setGroup("prodInfo");
-    fixedContributors.add(mc);
-
-    // Group pageexploring
-    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "FirstPage", "PreviousPage", "NextPage", "LastPage");
-    mc.setGroup("pageexploring");
-    fixedContributors.add(mc);
-
-    // Group zoom
-    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "ZoomIn", "ZoomOut");
-    mc.setGroup("zoom");
-    fixedContributors.add(mc);
-
-    // Group rotate
-    mc = new ActionFactoryMenuContributor(viewerSwingActionFactory, "PageSpin270", "PageSpin90");
-    mc.setGroup("rotate");
-    fixedContributors.add(mc);
+    // init gui just on edt!
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        initialiseGUI(args);
+      }
+    });
   }
 
 }

@@ -26,7 +26,7 @@ public class AnnotationsReadAPISample extends AbstractSample implements Executab
     /* G */.add(r.task(new ClasspathInputProvider("content.txt"))) //
     /* G */.add(r.task(new ClasspathInputProvider("watermark.png")).mapDefaultLayer().toFormLayer()) //
     /* G */.add(r.task(new ClasspathInputProvider("annotations.xml")).using(JadiceAnnotationFormat.class)); //
-    
+
 
     basicJadicePanel.getPageView().setDocument(r.getFirstDocument());
 

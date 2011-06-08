@@ -11,6 +11,11 @@ public class ConditionalToolSample extends AbstractSample implements StartStopSa
   }
 
   @Override
+  public boolean isStarted(BasicJadicePanel basicJadicePanel) {
+    return basicJadicePanel.getPageView().getToolManager().getCompatibleTools(ConditionalMarkerTool.class).size() > 0;
+  }
+
+  @Override
   public void start(BasicJadicePanel basicJadicePanel) {
     basicJadicePanel.getPageView().getToolManager().register(ConditionalMarkerTool.class, true);
   }
@@ -18,11 +23,6 @@ public class ConditionalToolSample extends AbstractSample implements StartStopSa
   @Override
   public void stop(BasicJadicePanel basicJadicePanel) {
     basicJadicePanel.getPageView().getToolManager().deregister(ConditionalMarkerTool.class);
-  }
-
-  @Override
-  public boolean isStarted(BasicJadicePanel basicJadicePanel) {
-    return basicJadicePanel.getPageView().getToolManager().getCompatibleTools(ConditionalMarkerTool.class).size() > 0;
   }
 
 }

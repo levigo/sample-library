@@ -28,10 +28,31 @@ import com.levigo.jadice.showcase.tool2.ConditionalToolSample;
 
 public class ControllerFrame extends JFrame {
 
-  public static final class SourceButton extends JButton implements ActionListener {
+  public static final class ExecuteButton extends JButton implements ActionListener {
+    private static final ImageIcon DEFAULT_ICON = new ImageIcon(
+        ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
     private static final long serialVersionUID = 1L;
+    private final BasicJadicePanel basicJadicePanel;
+    private final ExecutableSample sample;
+
+    public ExecuteButton(BasicJadicePanel basicJadicePanel, ExecutableSample sample) {
+      this.basicJadicePanel = basicJadicePanel;
+      this.sample = sample;
+      setBorder(new EmptyBorder(0, 0, 0, 0));
+      setIcon(DEFAULT_ICON);
+      addActionListener(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      sample.execute(basicJadicePanel);
+    }
+  }
+
+  public static final class SourceButton extends JButton implements ActionListener {
     private static final ImageIcon DEFAULT_ICON = new ImageIcon(
         ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/text-x-java.png"));
+    private static final long serialVersionUID = 1L;
     private final Class<?>[] classes;
 
     public SourceButton(Class<?>... classes) {
@@ -50,33 +71,116 @@ public class ControllerFrame extends JFrame {
 
   }
 
-  public static final class ExecuteButton extends JButton implements ActionListener {
-    private static final long serialVersionUID = 1L;
-    private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-        ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
-    private final ExecutableSample sample;
-    private final BasicJadicePanel basicJadicePanel;
 
-    public ExecuteButton(BasicJadicePanel basicJadicePanel, ExecutableSample sample) {
+  private static final class StartStopSampleStateManager {
+
+    private static final class StartButton extends JButton implements ActionListener {
+      private static final ImageIcon DEFAULT_ICON = new ImageIcon(
+          ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      private final StartStopSampleStateManager stateManager;
+
+      public StartButton(StartStopSampleStateManager stateManager) {
+        this.stateManager = stateManager;
+        setBorder(new EmptyBorder(0, 0, 0, 0));
+        setIcon(DEFAULT_ICON);
+        addActionListener(this);
+        updateState();
+      }
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        stateManager.start();
+      }
+
+      protected void updateState() {
+        setEnabled(!stateManager.isStarted());
+      }
+    }
+
+    private static final class StopButton extends JButton implements ActionListener {
+      private static final ImageIcon DEFAULT_ICON = new ImageIcon(
+          ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/stop-sign.png"));
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      private final StartStopSampleStateManager stateManager;
+
+      public StopButton(StartStopSampleStateManager stateManager) {
+        this.stateManager = stateManager;
+        setBorder(new EmptyBorder(0, 0, 0, 0));
+        setIcon(DEFAULT_ICON);
+        addActionListener(this);
+        updateState();
+      }
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        stateManager.stop();
+      }
+
+      protected void updateState() {
+        setEnabled(stateManager.isStarted());
+      }
+    }
+
+    private final BasicJadicePanel basicJadicePanel;
+    private final StartStopSample sample;
+    protected final StartButton startButton;
+    protected final StopButton stopButton;
+
+    public StartStopSampleStateManager(BasicJadicePanel basicJadicePanel, StartStopSample sample) {
+      super();
       this.basicJadicePanel = basicJadicePanel;
       this.sample = sample;
-      setBorder(new EmptyBorder(0, 0, 0, 0));
-      setIcon(DEFAULT_ICON);
-      addActionListener(this);
+      startButton = new StartButton(this);
+      stopButton = new StopButton(this);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      sample.execute(basicJadicePanel);
+    public JButton getStartButton() {
+      return startButton;
     }
+
+    public JButton getStopButton() {
+      return stopButton;
+    }
+
+    public boolean isStarted() {
+      return sample.isStarted(basicJadicePanel);
+    }
+
+    public void start() {
+      sample.start(basicJadicePanel);
+      updateStates();
+    }
+
+    public void stop() {
+      sample.stop(basicJadicePanel);
+      updateStates();
+    }
+
+
+    private void updateStates() {
+      if (startButton != null)
+        startButton.updateState();
+      if (stopButton != null)
+        stopButton.updateState();
+    }
+
   }
 
+  private static final long serialVersionUID = 1L;
+
+  private final BasicJadicePanel basicJadicePanel;
 
   private final Sample[] samples = new Sample[]{
       new ReadAPISample(), new LayeredReadAPISample(), new ToolSample(), new ConditionalToolSample(),
       new PermissionsSample(), new AnnotationsSavingSample(), new AnnotationsReadAPISample()
   };
-  private final BasicJadicePanel basicJadicePanel;
 
   public ControllerFrame(BasicJadicePanel basicJadicePanel) {
     super("jadice\u00ae 5 Showcase Controller");
@@ -118,99 +222,6 @@ public class ControllerFrame extends JFrame {
 
   }
 
-  private static final class StartStopSampleStateManager {
-
-    private static final class StartButton extends JButton implements ActionListener {
-      private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-          ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
-      private final StartStopSampleStateManager stateManager;
-
-      public StartButton(StartStopSampleStateManager stateManager) {
-        this.stateManager = stateManager;
-        setBorder(new EmptyBorder(0, 0, 0, 0));
-        setIcon(DEFAULT_ICON);
-        addActionListener(this);
-        updateState();
-      }
-
-      protected void updateState() {
-        setEnabled(!stateManager.isStarted());
-      }
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        stateManager.start();
-      }
-    }
-
-    private static final class StopButton extends JButton implements ActionListener {
-      private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-          ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/stop-sign.png"));
-      private final StartStopSampleStateManager stateManager;
-
-      public StopButton(StartStopSampleStateManager stateManager) {
-        this.stateManager = stateManager;
-        setBorder(new EmptyBorder(0, 0, 0, 0));
-        setIcon(DEFAULT_ICON);
-        addActionListener(this);
-        updateState();
-      }
-
-      protected void updateState() {
-        setEnabled(stateManager.isStarted());
-      }
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        stateManager.stop();
-      }
-    }
-
-    private final StartStopSample sample;
-    protected final StartButton startButton;
-    protected final StopButton stopButton;
-    private final BasicJadicePanel basicJadicePanel;
-
-    public StartStopSampleStateManager(BasicJadicePanel basicJadicePanel, StartStopSample sample) {
-      super();
-      this.basicJadicePanel = basicJadicePanel;
-      this.sample = sample;
-      startButton = new StartButton(this);
-      stopButton = new StopButton(this);
-    }
-
-    public JButton getStartButton() {
-      return startButton;
-    }
-
-    public JButton getStopButton() {
-      return stopButton;
-    }
-
-    public void stop() {
-      sample.stop(basicJadicePanel);
-      updateStates();
-    }
-
-    public boolean isStarted() {
-      return sample.isStarted(basicJadicePanel);
-    }
-
-    public void start() {
-      sample.start(basicJadicePanel);
-      updateStates();
-    }
-
-
-    private void updateStates() {
-      if (startButton != null)
-        startButton.updateState();
-      if (stopButton != null)
-        stopButton.updateState();
-    }
-
-  }
-
   private void initSamples(JPanel panel) {
 
     for (Sample s : samples) {
@@ -247,8 +258,6 @@ public class ControllerFrame extends JFrame {
     }
 
   }
-
-  private static final long serialVersionUID = 1L;
 
 
 }
