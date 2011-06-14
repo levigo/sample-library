@@ -1,4 +1,4 @@
-package com.levigo.jadice.showcase;
+package com.levigo.showcase.ui;
 
 import java.awt.BorderLayout;
 import java.io.IOException;

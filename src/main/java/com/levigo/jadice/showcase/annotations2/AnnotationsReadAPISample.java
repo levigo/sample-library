@@ -1,22 +1,25 @@
 package com.levigo.jadice.showcase.annotations2;
 
+import javax.inject.Inject;
+
 import com.levigo.jadice.demo.BasicJadicePanel;
 import com.levigo.jadice.document.read.fluent.AsyncReadConfigurer;
 import com.levigo.jadice.document.read.fluent.Read;
 import com.levigo.jadice.format.annotation.JadiceAnnotationFormat;
-import com.levigo.jadice.showcase.AbstractSample;
-import com.levigo.jadice.showcase.ExecutableSample;
 import com.levigo.jadice.showcase.util.ClasspathInputProvider;
 
-public class AnnotationsReadAPISample extends AbstractSample implements ExecutableSample {
+public class AnnotationsReadAPISample {
 
+  private final BasicJadicePanel basicJadicePanel;
 
-  public AnnotationsReadAPISample() {
-    super("Annotations, read combined", AnnotationsReadAPISample.class, ClasspathInputProvider.class);
+  @Inject
+  public AnnotationsReadAPISample(BasicJadicePanel basicJadicePanel) {
+    super();
+    this.basicJadicePanel = basicJadicePanel;
   }
 
-  @Override
-  public void execute(BasicJadicePanel basicJadicePanel) {
+
+  public void execute() {
 
     final AsyncReadConfigurer r = Read.asynchronously();
 

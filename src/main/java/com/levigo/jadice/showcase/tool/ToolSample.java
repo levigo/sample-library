@@ -1,27 +1,24 @@
 package com.levigo.jadice.showcase.tool;
 
+import javax.inject.Inject;
+
 import com.levigo.jadice.demo.BasicJadicePanel;
-import com.levigo.jadice.showcase.AbstractSample;
-import com.levigo.jadice.showcase.StartStopSample;
 
-public class ToolSample extends AbstractSample implements StartStopSample {
+public class ToolSample {
 
-  public ToolSample() {
-    super("Tool, simple Marker", MarkerTool.class, ToolSample.class);
+  private final BasicJadicePanel basicJadicePanel;
+
+  @Inject
+  public ToolSample(BasicJadicePanel basicJadicePanel) {
+    super();
+    this.basicJadicePanel = basicJadicePanel;
   }
 
-  @Override
-  public boolean isStarted(BasicJadicePanel basicJadicePanel) {
-    return basicJadicePanel.getPageView().getToolManager().getCompatibleTools(MarkerTool.class).size() > 0;
-  }
-
-  @Override
-  public void start(BasicJadicePanel basicJadicePanel) {
+  public void start() {
     basicJadicePanel.getPageView().getToolManager().register(MarkerTool.class, true);
   }
 
-  @Override
-  public void stop(BasicJadicePanel basicJadicePanel) {
+  public void stop() {
     basicJadicePanel.getPageView().getToolManager().deregister(MarkerTool.class);
   }
 

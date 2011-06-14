@@ -1,4 +1,4 @@
-package com.levigo.jadice.showcase;
+package com.levigo.showcase.ui;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -7,24 +7,26 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.levigo.jadice.demo.BasicJadicePanel;
-import com.levigo.jadice.showcase.annotations.AnnotationsSavingSample;
-import com.levigo.jadice.showcase.annotations2.AnnotationsReadAPISample;
-import com.levigo.jadice.showcase.permissions.PermissionsSample;
-import com.levigo.jadice.showcase.read.ReadAPISample;
-import com.levigo.jadice.showcase.read2.LayeredReadAPISample;
-import com.levigo.jadice.showcase.tool.ToolSample;
-import com.levigo.jadice.showcase.tool2.ConditionalToolSample;
+import com.levigo.showcase.SampleManager;
+import com.levigo.showcase.controllers.ExecutionController;
+import com.levigo.showcase.controllers.StartStopController;
+import com.levigo.showcase.descriptors.ControllerDescriptor;
+import com.levigo.showcase.descriptors.ExecutionControllerDescriptor;
+import com.levigo.showcase.descriptors.SampleDescriptor;
+import com.levigo.showcase.descriptors.StartStopControllerDescriptor;
 
 public class ControllerFrame extends JFrame {
 
@@ -32,12 +34,10 @@ public class ControllerFrame extends JFrame {
     private static final ImageIcon DEFAULT_ICON = new ImageIcon(
         ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
     private static final long serialVersionUID = 1L;
-    private final BasicJadicePanel basicJadicePanel;
-    private final ExecutableSample sample;
+    private final ExecutionController controller;
 
-    public ExecuteButton(BasicJadicePanel basicJadicePanel, ExecutableSample sample) {
-      this.basicJadicePanel = basicJadicePanel;
-      this.sample = sample;
+    public ExecuteButton(ExecutionController controller) {
+      this.controller = controller;
       setBorder(new EmptyBorder(0, 0, 0, 0));
       setIcon(DEFAULT_ICON);
       addActionListener(this);
@@ -45,7 +45,7 @@ public class ControllerFrame extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      sample.execute(basicJadicePanel);
+      controller.execute();
     }
   }
 
@@ -128,15 +128,15 @@ public class ControllerFrame extends JFrame {
       }
     }
 
-    private final BasicJadicePanel basicJadicePanel;
-    private final StartStopSample sample;
     protected final StartButton startButton;
     protected final StopButton stopButton;
+    private final StartStopController controller;
+    // FIXME that should be part of the StartStopController
+    private volatile boolean started;
 
-    public StartStopSampleStateManager(BasicJadicePanel basicJadicePanel, StartStopSample sample) {
+    public StartStopSampleStateManager(StartStopController controller) {
       super();
-      this.basicJadicePanel = basicJadicePanel;
-      this.sample = sample;
+      this.controller = controller;
       startButton = new StartButton(this);
       stopButton = new StopButton(this);
     }
@@ -150,16 +150,18 @@ public class ControllerFrame extends JFrame {
     }
 
     public boolean isStarted() {
-      return sample.isStarted(basicJadicePanel);
+      return started;
     }
 
     public void start() {
-      sample.start(basicJadicePanel);
+      controller.start();
+      started = true;
       updateStates();
     }
 
     public void stop() {
-      sample.stop(basicJadicePanel);
+      controller.stop();
+      started = false;
       updateStates();
     }
 
@@ -177,15 +179,14 @@ public class ControllerFrame extends JFrame {
 
   private final BasicJadicePanel basicJadicePanel;
 
-  private final Sample[] samples = new Sample[]{
-      new ReadAPISample(), new LayeredReadAPISample(), new ToolSample(), new ConditionalToolSample(),
-      new PermissionsSample(), new AnnotationsSavingSample(), new AnnotationsReadAPISample()
-  };
+  private final SampleManager manager;
 
   public ControllerFrame(BasicJadicePanel basicJadicePanel) {
     super("jadice\u00ae 5 Showcase Controller");
     setIconImage((Image) UIManager.get("Jadice.window.icon.image"));
     this.basicJadicePanel = basicJadicePanel;
+    manager = new SampleManager(basicJadicePanel);
+
     setResizable(false);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     getContentPane().setLayout(new BorderLayout(0, 0));
@@ -197,14 +198,7 @@ public class ControllerFrame extends JFrame {
 
     initSamples(panel);
 
-    JSeparator separator = new JSeparator();
-    GridBagConstraints gbc_separator = new GridBagConstraints();
-    gbc_separator.insets = new Insets(0, 0, 5, 0);
-    gbc_separator.gridx = 0;
-    gbc_separator.gridwidth = 3;
-    gbc_separator.weightx = 1.0;
-    gbc_separator.fill = GridBagConstraints.HORIZONTAL;
-    panel.add(separator, gbc_separator);
+    separator(panel);
 
     JLabel lblControllerSource = new JLabel("Showcase Controller Source Code");
     GridBagConstraints gbc_lblControllerSource = new GridBagConstraints();
@@ -220,13 +214,30 @@ public class ControllerFrame extends JFrame {
     gbc_button.gridx = 2;
     panel.add(button, gbc_button);
 
+    separator(panel);
+
+    final JPanel layerPanel = new JPanel();
+    new JScrollPane(layerPanel);
+  }
+
+  private void separator(JPanel panel) {
+    JSeparator separator = new JSeparator();
+    GridBagConstraints gbc_separator = new GridBagConstraints();
+    gbc_separator.insets = new Insets(0, 0, 5, 0);
+    gbc_separator.gridx = 0;
+    gbc_separator.gridwidth = 3;
+    gbc_separator.weightx = 1.0;
+    gbc_separator.fill = GridBagConstraints.HORIZONTAL;
+    panel.add(separator, gbc_separator);
   }
 
   private void initSamples(JPanel panel) {
 
-    for (Sample s : samples) {
+    List<SampleDescriptor> sds = manager.getSamples();
 
-      final JLabel lbl = new JLabel(s.name());
+    for (SampleDescriptor sd : sds) {
+
+      final JLabel lbl = new JLabel(sd.getName());
       GridBagConstraints gbc = new GridBagConstraints();
       gbc.weightx = 1.0;
       gbc.anchor = GridBagConstraints.WEST;
@@ -237,14 +248,28 @@ public class ControllerFrame extends JFrame {
 
       JPanel buttonPanel = new JPanel();
 
-      if (s instanceof ExecutableSample) {
-        buttonPanel.add(new ExecuteButton(basicJadicePanel, (ExecutableSample) s));
-      } else if (s instanceof StartStopSample) {
-        final StartStopSampleStateManager stateManager = new StartStopSampleStateManager(basicJadicePanel,
-            (StartStopSample) s);
-        buttonPanel.add(stateManager.getStartButton());
-        buttonPanel.add(stateManager.getStopButton());
+      final Object si = manager.createSampleInstance(sd);
+
+      // for now we're respecting only the first controller
+      if (sd.getControllers().size() == 1) {
+        final ControllerDescriptor c = sd.getControllers().get(0);
+
+        if (c instanceof ExecutionControllerDescriptor) {
+
+          final ExecutionController controller = ExecutionController.create(si, (ExecutionControllerDescriptor) c);
+
+          buttonPanel.add(new ExecuteButton(controller));
+
+        } else if (c instanceof StartStopControllerDescriptor) {
+
+          final StartStopController controller = StartStopController.create(si, (StartStopControllerDescriptor) c);
+          final StartStopSampleStateManager stateManager = new StartStopSampleStateManager(controller);
+          buttonPanel.add(stateManager.getStartButton());
+          buttonPanel.add(stateManager.getStopButton());
+        }
+
       }
+
 
       gbc = new GridBagConstraints();
       gbc.gridx = 1;
@@ -253,7 +278,7 @@ public class ControllerFrame extends JFrame {
 
       gbc = new GridBagConstraints();
       gbc.gridx = 2;
-      panel.add(new SourceButton(s.getClasses()), gbc);
+      panel.add(new SourceButton(sd.getClasses().toArray(new Class[sd.getClasses().size()])), gbc);
 
     }
 

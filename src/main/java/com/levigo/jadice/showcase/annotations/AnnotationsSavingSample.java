@@ -4,24 +4,28 @@ import java.awt.Component;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 
+import javax.inject.Inject;
+
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.levigo.jadice.demo.BasicJadicePanel;
 import com.levigo.jadice.document.UIDocument;
 import com.levigo.jadice.document.write.DefaultWriterControls;
 import com.levigo.jadice.format.annotation.JadiceAnnotationWriter;
-import com.levigo.jadice.showcase.AbstractSample;
-import com.levigo.jadice.showcase.ExecutableSample;
-import com.levigo.jadice.showcase.SourceViewerFrame;
 import com.levigo.jadice.showcase.util.XMLUtils;
+import com.levigo.showcase.ui.SourceViewerFrame;
 
-public class AnnotationsSavingSample extends AbstractSample implements ExecutableSample {
-  public AnnotationsSavingSample() {
-    super("Annotations, save xml format", AnnotationsSavingSample.class);
+public class AnnotationsSavingSample {
+
+  private final BasicJadicePanel basicJadicePanel;
+
+  @Inject
+  public AnnotationsSavingSample(BasicJadicePanel basicJadicePanel) {
+    super();
+    this.basicJadicePanel = basicJadicePanel;
   }
 
-  @Override
-  public void execute(BasicJadicePanel basicJadicePanel) {
+  public void execute() {
 
     final UIDocument<Component> doc = basicJadicePanel.getPageView().getDocument();
 

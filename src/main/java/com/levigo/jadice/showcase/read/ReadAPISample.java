@@ -1,22 +1,25 @@
 package com.levigo.jadice.showcase.read;
 
 
+import javax.inject.Inject;
+
 import com.levigo.jadice.demo.BasicJadicePanel;
 import com.levigo.jadice.document.read.fluent.AsyncReadConfigurer;
 import com.levigo.jadice.document.read.fluent.Read;
-import com.levigo.jadice.showcase.AbstractSample;
-import com.levigo.jadice.showcase.ExecutableSample;
 import com.levigo.jadice.showcase.util.ClasspathInputProvider;
 
-public class ReadAPISample extends AbstractSample implements ExecutableSample {
+public class ReadAPISample {
 
+  private final BasicJadicePanel basicJadicePanel;
 
-  public ReadAPISample() {
-    super("Read API, single Layer", ReadAPISample.class, ClasspathInputProvider.class);
+  @Inject
+  public ReadAPISample(BasicJadicePanel basicJadicePanel) {
+    super();
+    this.basicJadicePanel = basicJadicePanel;
   }
 
-  @Override
-  public void execute(BasicJadicePanel basicJadicePanel) {
+
+  public void execute() {
 
     final AsyncReadConfigurer r = Read.asynchronously();
 
