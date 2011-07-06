@@ -5,52 +5,7 @@
 	<artifactId>jadice-5-tech-showcase</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
-	<properties>
-		<jadice.version>5.0.0.0-RC-2</jadice.version>
-	</properties>
-
 	<dependencies>
-		<!-- CORE -->
-		<dependency>
-			<groupId>com.levigo.jadice.documentplatform</groupId>
-			<artifactId>jadice-viewer</artifactId>
-			<version>${jadice.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.levigo.jadice.documentplatform</groupId>
-			<artifactId>jadice-appbase</artifactId>
-			<version>${jadice.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.levigo.jadice.documentplatform</groupId>
-			<artifactId>jadice-demo-client</artifactId>
-			<version>${jadice.version}</version>
-		</dependency>
-
-		<!-- FORMATS -->
-		<dependency>
-			<groupId>com.levigo.jadice.documentplatform</groupId>
-			<artifactId>jadice-format-modca</artifactId>
-			<version>${jadice.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.levigo.jadice.documentplatform</groupId>
-			<artifactId>jadice-format-pdf</artifactId>
-			<version>${jadice.version}</version>
-		</dependency>
-
-		<!-- ADDONS -->
-		<dependency>
-			<groupId>com.levigo.jadice.documentplatform</groupId>
-			<artifactId>jadice-addon-crosshair</artifactId>
-			<version>${jadice.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.levigo.jadice.documentplatform</groupId>
-			<artifactId>jadice-addon-crosshair</artifactId>
-			<version>${jadice.version}</version>
-		</dependency>
-
 		<!-- UTILITIES -->
 		<dependency>
 			<groupId>com.google.guava</groupId>

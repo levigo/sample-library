@@ -1,25 +1,26 @@
 package com.levigo.showcase.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
+import javax.swing.tree.TreePath;
 
-import com.levigo.jadice.demo.BasicJadicePanel;
+import com.levigo.showcase.Category;
 import com.levigo.showcase.SampleManager;
 import com.levigo.showcase.controllers.ExecutionController;
 import com.levigo.showcase.controllers.StartStopController;
@@ -30,162 +31,15 @@ import com.levigo.showcase.descriptors.StartStopControllerDescriptor;
 
 public class ControllerFrame extends JFrame {
 
-  public static final class ExecuteButton extends JButton implements ActionListener {
-    private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-        ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
-    private static final long serialVersionUID = 1L;
-    private final ExecutionController controller;
-
-    public ExecuteButton(ExecutionController controller) {
-      this.controller = controller;
-      setBorder(new EmptyBorder(0, 0, 0, 0));
-      setIcon(DEFAULT_ICON);
-      addActionListener(this);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      controller.execute();
-    }
-  }
-
-  public static final class SourceButton extends JButton implements ActionListener {
-    private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-        ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/text-x-java.png"));
-    private static final long serialVersionUID = 1L;
-    private final Class<?>[] classes;
-
-    public SourceButton(Class<?>... classes) {
-      this.classes = classes;
-      setBorder(new EmptyBorder(0, 0, 0, 0));
-      setIcon(DEFAULT_ICON);
-
-      addActionListener(this);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      final SourceViewerFrame svf = SourceViewerFrame.forClasses(classes);
-      svf.setVisible(true);
-    }
-
-  }
-
-
-  private static final class StartStopSampleStateManager {
-
-    private static final class StartButton extends JButton implements ActionListener {
-      private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-          ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
-      /**
-       * 
-       */
-      private static final long serialVersionUID = 1L;
-      private final StartStopSampleStateManager stateManager;
-
-      public StartButton(StartStopSampleStateManager stateManager) {
-        this.stateManager = stateManager;
-        setBorder(new EmptyBorder(0, 0, 0, 0));
-        setIcon(DEFAULT_ICON);
-        addActionListener(this);
-        updateState();
-      }
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        stateManager.start();
-      }
-
-      protected void updateState() {
-        setEnabled(!stateManager.isStarted());
-      }
-    }
-
-    private static final class StopButton extends JButton implements ActionListener {
-      private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-          ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/stop-sign.png"));
-      /**
-       * 
-       */
-      private static final long serialVersionUID = 1L;
-      private final StartStopSampleStateManager stateManager;
-
-      public StopButton(StartStopSampleStateManager stateManager) {
-        this.stateManager = stateManager;
-        setBorder(new EmptyBorder(0, 0, 0, 0));
-        setIcon(DEFAULT_ICON);
-        addActionListener(this);
-        updateState();
-      }
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        stateManager.stop();
-      }
-
-      protected void updateState() {
-        setEnabled(stateManager.isStarted());
-      }
-    }
-
-    protected final StartButton startButton;
-    protected final StopButton stopButton;
-    private final StartStopController controller;
-    // FIXME that should be part of the StartStopController
-    private volatile boolean started;
-
-    public StartStopSampleStateManager(StartStopController controller) {
-      super();
-      this.controller = controller;
-      startButton = new StartButton(this);
-      stopButton = new StopButton(this);
-    }
-
-    public JButton getStartButton() {
-      return startButton;
-    }
-
-    public JButton getStopButton() {
-      return stopButton;
-    }
-
-    public boolean isStarted() {
-      return started;
-    }
-
-    public void start() {
-      controller.start();
-      started = true;
-      updateStates();
-    }
-
-    public void stop() {
-      controller.stop();
-      started = false;
-      updateStates();
-    }
-
-
-    private void updateStates() {
-      if (startButton != null)
-        startButton.updateState();
-      if (stopButton != null)
-        stopButton.updateState();
-    }
-
-  }
-
   private static final long serialVersionUID = 1L;
 
-  private final BasicJadicePanel basicJadicePanel;
 
   private final SampleManager manager;
 
-  public ControllerFrame(BasicJadicePanel basicJadicePanel) {
+  public ControllerFrame() {
     super("jadice\u00ae 5 Showcase Controller");
     setIconImage((Image) UIManager.get("Jadice.window.icon.image"));
-    this.basicJadicePanel = basicJadicePanel;
-    manager = new SampleManager(basicJadicePanel);
+    manager = new SampleManager();
 
     setResizable(false);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -195,6 +49,7 @@ public class ControllerFrame extends JFrame {
     panel.setBorder(new EmptyBorder(20, 20, 0, 20));
     getContentPane().add(panel);
 
+    initSamplesTree(panel);
 
     initSamples(panel);
 
@@ -209,7 +64,7 @@ public class ControllerFrame extends JFrame {
     gbc_lblControllerSource.gridx = 0;
     panel.add(lblControllerSource, gbc_lblControllerSource);
 
-    SourceButton button = new SourceButton(ShowcaseJadicePanel.class, ControllerFrame.class, SourceViewerFrame.class);
+    SourceButton button = new SourceButton(ControllerFrame.class, SourceViewerFrame.class);
     GridBagConstraints gbc_button = new GridBagConstraints();
     gbc_button.gridx = 2;
     panel.add(button, gbc_button);
@@ -218,6 +73,23 @@ public class ControllerFrame extends JFrame {
 
     final JPanel layerPanel = new JPanel();
     new JScrollPane(layerPanel);
+  }
+
+  private void initSamplesTree(JPanel panel) {
+    final JTree sampleTree = new JTree(new SampleTreeModel(manager));
+    final GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridwidth = 3;
+    gbc.weightx = 1.0;
+    gbc.weighty = 1.0;
+    gbc.fill = GridBagConstraints.BOTH;
+
+    final JScrollPane scrollPane = new JScrollPane(sampleTree);
+    scrollPane.setPreferredSize(new Dimension(200, 400));
+    panel.add(scrollPane, gbc);
+
+
+    sampleTree.setRootVisible(true);
   }
 
   private void separator(JPanel panel) {

@@ -29,6 +29,10 @@ public class SampleDescriptor {
   })
   protected List<RequirementDescriptor> requirements;
 
+  @XmlElementWrapper(name="categories")
+  @XmlElement(name="category")
+  protected List<String> categories;
+  
   @XmlElements({
       @XmlElement(name = "start-stop-controller", type = StartStopControllerDescriptor.class),
       @XmlElement(name = "execution-controller", type = ExecutionControllerDescriptor.class)
@@ -95,5 +99,11 @@ public class SampleDescriptor {
     if(requirements == null)
       requirements = new ArrayList<RequirementDescriptor>();
     return requirements;
+  }
+  
+  public List<String> getCategories() {
+    if(categories == null)
+      categories = new ArrayList<String>();
+    return categories;
   }
 }

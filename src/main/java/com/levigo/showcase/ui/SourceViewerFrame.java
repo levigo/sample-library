@@ -10,14 +10,14 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import jsyntaxpane.DefaultSyntaxKit;
+
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 
 public class SourceViewerFrame extends JFrame {
-  /**
-   * 
-   */
+
   private static final long serialVersionUID = 1L;
 
   private static final class ByteArraySourceInputSupplier implements NamedInputSupplier<String> {
