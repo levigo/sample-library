@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -18,8 +20,35 @@ import com.levigo.showcase.descriptors.RequireSampleHostDescriptor;
 import com.levigo.showcase.descriptors.RequirementDescriptor;
 import com.levigo.showcase.descriptors.SampleDescriptor;
 import com.levigo.showcase.descriptors.SampleHostDescriptor;
+import com.levigo.showcase.util.TreeWalker;
 
 public class SampleManager {
+
+  private static final Logger LOG = Logger.getLogger(SampleManager.class.getName());
+
+  private static final class CategoryDescriptorDebugTreeWalker extends TreeWalker<CategoryDescriptor> {
+    private final Logger log;
+
+    public CategoryDescriptorDebugTreeWalker(Logger log) {
+      super();
+      this.log = log;
+    }
+
+    @Override
+    protected Iterable<CategoryDescriptor> loadChildren(CategoryDescriptor parent, TraversalContext context) {
+      return parent.getChildren() != null ? parent.getChildren() : TreeWalker.<CategoryDescriptor> empty();
+    }
+
+    @Override
+    protected void process(CategoryDescriptor obj, TraversalContext context) {
+      StringBuilder b = new StringBuilder();
+      for (int i = 0; i < context.getDepth(); i++)
+        b.append("  ");
+      b.append(obj.getId());
+      
+      log.fine(b.toString());
+    }
+  }
 
   // FIXME should that really be static?`
   private static final Injector ROOT_INJECTOR = Guice.createInjector(new AbstractModule() {
@@ -55,33 +84,35 @@ public class SampleManager {
         return null;
       }
     });
-        
-    final List<Category> allCategories = new ArrayList<Category>();
-    List<SampleInstance> tmp = load("META-INF/levigo-samples.xml",
-        new Processor<List<SampleInstance>, InputStream>() {
-          final List<SampleInstance> sds = new ArrayList<SampleInstance>();
 
-          @Override
-          public List<SampleInstance> process(InputStream in) throws Exception {
-            LevigoSamples samples = LevigoSamples.read(in);
-            
-            // FIXME category collision
-            for (CategoryDescriptor desc : samples.getCategories()) {
-              allCategories.add(Category.create(desc));
-            }
-            
-            for(SampleDescriptor desc : samples.getSamples()) {
-              sds.add(new SampleInstance(SampleManager.this, desc));
-            }
-            return sds;
-          }
-        });
-    
+    final List<Category> allCategories = new ArrayList<Category>();
+    List<SampleInstance> tmp = load("META-INF/levigo-samples.xml", new Processor<List<SampleInstance>, InputStream>() {
+      final List<SampleInstance> sds = new ArrayList<SampleInstance>();
+
+      @Override
+      public List<SampleInstance> process(InputStream in) throws Exception {
+        LevigoSamples samples = LevigoSamples.read(in);
+
+
+        // FIXME category collision
+        for (CategoryDescriptor desc : samples.getCategories()) {
+          if (LOG.isLoggable(Level.FINE))
+            new CategoryDescriptorDebugTreeWalker(LOG).walk(desc);
+          allCategories.add(Category.create(desc));
+        }
+
+        for (SampleDescriptor desc : samples.getSamples()) {
+          sds.add(new SampleInstance(SampleManager.this, desc));
+        }
+        return sds;
+      }
+    });
+
     if (tmp == null)
       tmp = new ArrayList<SampleInstance>();
-    
+
     samples = tmp;
-    
+
     categories = new RootCategory(allCategories);
 
     for (SampleInstance si : samples) {
@@ -131,7 +162,7 @@ public class SampleManager {
   }
 
   private final List<SampleInstance> samples;
-  
+
   public List<SampleInstance> getSamples() {
     return samples;
   }
