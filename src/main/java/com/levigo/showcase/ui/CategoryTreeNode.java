@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.levigo.showcase.Category;
-import com.levigo.showcase.descriptors.SampleDescriptor;
+import com.levigo.showcase.SampleInstance;
 
 public class CategoryTreeNode {
   private final Category category;
@@ -27,9 +27,9 @@ public class CategoryTreeNode {
           return new CategoryTreeNode(input);
         }
       }));
-      result.addAll(Lists.transform(category.getSamples(), new Function<SampleDescriptor, Object>() {
+      result.addAll(Lists.transform(category.getSamples(), new Function<SampleInstance, Object>() {
         @Override
-        public Object apply(SampleDescriptor input) {
+        public Object apply(SampleInstance input) {
           return new SampleTreeNode(input);
         }
       }));
@@ -41,5 +41,9 @@ public class CategoryTreeNode {
   @Override
   public String toString() {
     return category.getName();
+  }
+
+  public Category getCategory() {
+    return category;
   }
 }

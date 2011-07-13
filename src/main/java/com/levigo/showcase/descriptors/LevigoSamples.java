@@ -11,16 +11,25 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.stream.StreamSource;
 
 @XmlRootElement(name = "levigo-samples")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LevigoSamples {
+  @XmlElementWrapper(name = "categories")
+  @XmlElement(name = "category", type = CategoryDescriptor.class)
+  protected List<CategoryDescriptor> categories;
 
   @XmlElement(name = "sample")
   protected List<SampleDescriptor> samples;
 
+  public List<CategoryDescriptor> getCategories() {
+    if (categories == null)
+      categories = new ArrayList<CategoryDescriptor>();
+    return categories;
+  }
 
   public List<SampleDescriptor> getSamples() {
     if (samples == null)

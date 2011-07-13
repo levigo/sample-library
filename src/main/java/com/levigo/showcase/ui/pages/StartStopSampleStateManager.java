@@ -1,17 +1,20 @@
-package com.levigo.showcase.ui;
+package com.levigo.showcase.ui.pages;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.border.EmptyBorder;
 
 import com.levigo.showcase.controllers.StartStopController;
+import com.levigo.showcase.ui.ControllerFrame;
 
 final class StartStopSampleStateManager {
 
-  private static final class StartButton extends JButton implements ActionListener {
+  private static final class StartAction extends AbstractAction {
     private static final ImageIcon DEFAULT_ICON = new ImageIcon(
         ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/next.png"));
     /**
@@ -20,13 +23,9 @@ final class StartStopSampleStateManager {
     private static final long serialVersionUID = 1L;
     private final StartStopSampleStateManager stateManager;
 
-    public StartButton(StartStopSampleStateManager stateManager) {
+    public StartAction(StartStopSampleStateManager stateManager) {
+      super("Start");
       this.stateManager = stateManager;
-      setBorder(new EmptyBorder(0, 0, 0, 0));
-      setBorderPainted(false);
-      setRolloverEnabled(true);
-      setIcon(DEFAULT_ICON);
-      addActionListener(this);
       updateState();
     }
 
@@ -40,7 +39,7 @@ final class StartStopSampleStateManager {
     }
   }
 
-  private static final class StopButton extends JButton implements ActionListener {
+  private static final class StopAction extends AbstractAction {
     private static final ImageIcon DEFAULT_ICON = new ImageIcon(
         ControllerFrame.class.getResource("/com/levigo/jadice/showcase/icons/stop-sign.png"));
     /**
@@ -49,13 +48,9 @@ final class StartStopSampleStateManager {
     private static final long serialVersionUID = 1L;
     private final StartStopSampleStateManager stateManager;
 
-    public StopButton(StartStopSampleStateManager stateManager) {
+    public StopAction(StartStopSampleStateManager stateManager) {
+      super("Stop");
       this.stateManager = stateManager;
-      setBorder(new EmptyBorder(0, 0, 0, 0));
-      setBorderPainted(false);
-      setRolloverEnabled(true);
-      setIcon(DEFAULT_ICON);
-      addActionListener(this);
       updateState();
     }
 
@@ -69,8 +64,8 @@ final class StartStopSampleStateManager {
     }
   }
 
-  protected final StartStopSampleStateManager.StartButton startButton;
-  protected final StartStopSampleStateManager.StopButton stopButton;
+  protected final StartStopSampleStateManager.StartAction startAction;
+  protected final StartStopSampleStateManager.StopAction stopAction;
   private final StartStopController controller;
   // FIXME that should be part of the StartStopController
   private volatile boolean started;
@@ -78,16 +73,16 @@ final class StartStopSampleStateManager {
   public StartStopSampleStateManager(StartStopController controller) {
     super();
     this.controller = controller;
-    startButton = new StartButton(this);
-    stopButton = new StopButton(this);
+    startAction = new StartAction(this);
+    stopAction = new StopAction(this);
   }
 
-  public JButton getStartButton() {
-    return startButton;
+  public Action getStartAction() {
+    return startAction;
   }
 
-  public JButton getStopButton() {
-    return stopButton;
+  public Action getStopAction() {
+    return stopAction;
   }
 
   public boolean isStarted() {
@@ -108,10 +103,10 @@ final class StartStopSampleStateManager {
 
 
   private void updateStates() {
-    if (startButton != null)
-      startButton.updateState();
-    if (stopButton != null)
-      stopButton.updateState();
+    if (startAction != null)
+      startAction.updateState();
+    if (stopAction != null)
+      stopAction.updateState();
   }
 
 }

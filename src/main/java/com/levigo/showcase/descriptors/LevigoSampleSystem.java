@@ -18,19 +18,9 @@ import javax.xml.transform.stream.StreamSource;
 @XmlRootElement(name = "levigo-sample-system")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LevigoSampleSystem {
-  @XmlElementWrapper(name = "categories")
-  @XmlElement(name = "category", type = CategoryDescriptor.class)
-  protected List<CategoryDescriptor> categories;
-  
   @XmlElementWrapper(name="sample-hosts")
   @XmlElement(name="sample-host")
   protected List<SampleHostDescriptor> sampleHosts;
-
-  public List<CategoryDescriptor> getCategories() {
-    if (categories == null)
-      categories = new ArrayList<CategoryDescriptor>();
-    return categories;
-  }
 
   public List<SampleHostDescriptor> getSampleHosts() {
     if (sampleHosts == null)

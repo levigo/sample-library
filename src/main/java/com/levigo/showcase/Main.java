@@ -12,8 +12,7 @@ public class Main {
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      // we don't care.
     }
 
     SwingUtilities.invokeLater(new Runnable() {

@@ -1,11 +1,14 @@
 package com.levigo.showcase;
 
+import java.util.logging.Logger;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.levigo.showcase.descriptors.ProviderDescriptor;
 import com.levigo.showcase.descriptors.SampleHostDescriptor;
 
 public class SampleHostInstance {
+  private static final Logger LOG = Logger.getLogger(SampleHostDescriptor.class.getName());
 
   public static final class SampleHostModule extends AbstractModule {
     private final SampleHostDescriptor shd;
@@ -21,8 +24,10 @@ public class SampleHostInstance {
     })
     @Override
     protected void configure() {
+      LOG.info("Configuring sample host '" + shd.getId() + '\'');
+      // FIXME error detection and prevention
       for (ProviderDescriptor pd : shd.getProviders()) {
-
+        LOG.info("\tClass '" + pd.getProvidedClass() + "' provided using '" + pd.getProvider()+"'");
         final AnnotatedBindingBuilder b = bind(pd.getProvidedClass());
         b.toProvider(pd.getProvider());
       }

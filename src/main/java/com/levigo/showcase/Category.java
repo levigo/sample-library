@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.levigo.showcase.descriptors.CategoryDescriptor;
-import com.levigo.showcase.descriptors.SampleDescriptor;
 
 public class Category {
 
@@ -16,7 +15,8 @@ public class Category {
       categories.add(create(cd));
     }
 
-    return new Category(descriptor.getId(), descriptor.getName(), descriptor.getDescription(), categories);
+    final String desc = descriptor.getDescription();
+    return new Category(descriptor.getId(), descriptor.getName(), desc != null ? desc.trim() : "", categories);
   }
 
   private final String id;
@@ -25,7 +25,7 @@ public class Category {
 
   private final List<Category> categories;
   // FIXME SampleInstance instead?
-  protected final List<SampleDescriptor> samples;
+  protected final List<SampleInstance> samples;
 
   public Category(String id, String name, String description, List<Category> children) {
     super();
@@ -33,7 +33,7 @@ public class Category {
     this.name = name;
     this.description = description;
     this.categories = children;
-    this.samples = new ArrayList<SampleDescriptor>();
+    this.samples = new ArrayList<SampleInstance>();
   }
 
   public List<Category> getCategories() {
@@ -52,8 +52,8 @@ public class Category {
     return name;
   }
 
-  public boolean install(SampleDescriptor sample) {
-    if (sample.getCategories().contains(getId())) {
+  public boolean install(SampleInstance sample) {
+    if (sample.getDescriptor().getCategories().contains(getId())) {
       samples.add(sample);
       return true;
     }
@@ -66,7 +66,7 @@ public class Category {
     return false;
   }
 
-  public List<SampleDescriptor> getSamples() {
+  public List<SampleInstance> getSamples() {
     return samples;
   }
 }

@@ -1,16 +1,20 @@
 package com.levigo.showcase.ui;
 
-import com.levigo.showcase.descriptors.SampleDescriptor;
+import com.levigo.showcase.SampleInstance;
 
 public class SampleTreeNode {
 
-  private final SampleDescriptor sampleDescriptor;
+  private final SampleInstance sample;
 
-  public SampleTreeNode(SampleDescriptor sampleDescriptor) {
-    this.sampleDescriptor = sampleDescriptor;
+  public SampleTreeNode(SampleInstance sampleDescriptor) {
+    this.sample = sampleDescriptor;
   }
 
   public String toString() {
-    return sampleDescriptor.getName();
+    return sample.getDescriptor().getName();
+  }
+
+  public SampleInstance getSample() {
+    return sample;
   }
 }

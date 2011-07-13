@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CategoryDescriptor {
@@ -15,6 +16,7 @@ public class CategoryDescriptor {
   private String name;
   @XmlElement
   private String description;
+  @XmlElementWrapper(name="categories")
   @XmlElement(name = "category")
   private List<CategoryDescriptor> children;
 
