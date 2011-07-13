@@ -14,7 +14,8 @@ public class CategoryDetailsPage extends CaptionDetailsPage {
 
     JTextPane descriptionTextPane = new JTextPane();
     descriptionTextPane.setEditable(false);
-    descriptionTextPane.setText(category.getDescription().trim());
+    descriptionTextPane.setContentType("text/html");
+    descriptionTextPane.setText("<html>" + category.getDescription() + "</html>");
 
     setBody(descriptionTextPane);
 
