@@ -8,6 +8,7 @@
 
 	<modules>
 		<module>lib/jsyntaxeditor</module>
+		<module>api</module>
 		<module>core</module>
 	</modules>
 	

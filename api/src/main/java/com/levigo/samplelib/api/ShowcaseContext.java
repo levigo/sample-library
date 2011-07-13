@@ -1,4 +1,4 @@
-package com.levigo.samplelib;
+package com.levigo.samplelib.api;
 
 import java.util.concurrent.ConcurrentHashMap;
 

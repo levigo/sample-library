@@ -13,6 +13,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.levigo.samplelib.SampleHostInstance.SampleHostModule;
+import com.levigo.samplelib.api.ShowcaseContext;
 import com.levigo.samplelib.descriptors.CategoryDescriptor;
 import com.levigo.samplelib.descriptors.LevigoSampleSystem;
 import com.levigo.samplelib.descriptors.LevigoSamples;

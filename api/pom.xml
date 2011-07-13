@@ -6,35 +6,15 @@
 		<artifactId>samplelib</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>samplelib-core</artifactId>
+	<artifactId>samplelib-api</artifactId>
 
 	<dependencies>
 		<!-- UTILITIES -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>samplelib-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>samplelib-jsyntaxpane</artifactId>
-			<version>0.9.5</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>r09</version>
-		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<version>3.0</version>
 		</dependency>
-		<!-- dependency>
-			<groupId>org.swinglabs</groupId>
-			<artifactId>jxlayer</artifactId>
-			<version>3.0.4</version>
-		</dependency -->
 	</dependencies>
 
 	<build>
