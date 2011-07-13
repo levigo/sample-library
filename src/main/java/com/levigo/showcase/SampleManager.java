@@ -185,7 +185,7 @@ public class SampleManager {
         res = processor.process(is);
 
       } catch (Exception e) {
-        // TODO Auto-generated catch block
+        // FIXME better exception handling!
         e.printStackTrace();
       }
     }
