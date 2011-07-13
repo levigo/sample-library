@@ -13,7 +13,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.levigo.samplelib.SampleHostInstance.SampleHostModule;
-import com.levigo.samplelib.api.ShowcaseContext;
+import com.levigo.samplelib.api.SampleLibraryContext;
 import com.levigo.samplelib.descriptors.CategoryDescriptor;
 import com.levigo.samplelib.descriptors.LevigoSampleSystem;
 import com.levigo.samplelib.descriptors.LevigoSamples;
@@ -55,7 +55,7 @@ public class SampleManager {
   private static final Injector ROOT_INJECTOR = Guice.createInjector(new AbstractModule() {
     @Override
     protected void configure() {
-      bind(ShowcaseContext.class).toInstance(new ShowcaseContext());
+      bind(SampleLibraryContext.class).toInstance(new SampleLibraryContext());
     }
   });
 
