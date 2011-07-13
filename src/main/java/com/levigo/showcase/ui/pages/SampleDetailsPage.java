@@ -14,7 +14,6 @@ import com.levigo.showcase.SampleInstance;
 import com.levigo.showcase.controllers.AbstractController;
 import com.levigo.showcase.controllers.ExecutionController;
 import com.levigo.showcase.controllers.StartStopController;
-import com.levigo.showcase.ui.ExecuteAction;
 
 public class SampleDetailsPage extends CaptionDetailsPage {
   private static final long serialVersionUID = 1L;
